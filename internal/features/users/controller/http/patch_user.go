@@ -30,12 +30,12 @@ func (h *Handler) PatchUser(
 	if err := core_http_request.DecodeAndValidateRequest(r, &input); err != nil {
 		responseHandler.ErrorResponse(
 			err,
-			"Failed to decode and validate HTTP request",
+			"failed to decode and validate HTTP request",
 		)
 		return
 	}
 
-	user, err := h.service.PatchUser(ctx, userID, input)
+	output, err := h.service.PatchUser(ctx, userID, input)
 	if err != nil {
 		responseHandler.ErrorResponse(
 			err,
@@ -44,5 +44,5 @@ func (h *Handler) PatchUser(
 		return
 	}
 
-	responseHandler.JSONResponse(user, http.StatusOK)
+	responseHandler.JSONResponse(output, http.StatusOK)
 }

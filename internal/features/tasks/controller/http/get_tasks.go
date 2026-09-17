@@ -1,4 +1,4 @@
-package users_http
+package tasks_http
 
 import (
 	"fmt"
@@ -7,10 +7,10 @@ import (
 	core_logger "github.com/abi-kan/golang-todoapp/internal/core/logger"
 	core_http_request "github.com/abi-kan/golang-todoapp/internal/core/transport/http/request"
 	core_http_response "github.com/abi-kan/golang-todoapp/internal/core/transport/http/response"
-	users_dto "github.com/abi-kan/golang-todoapp/internal/features/users/dto"
+	tasks_dto "github.com/abi-kan/golang-todoapp/internal/features/tasks/dto"
 )
 
-func (h *Handler) GetUsers(
+func (h *Handler) GetTasks(
 	rw http.ResponseWriter,
 	r *http.Request,
 ) {
@@ -18,7 +18,7 @@ func (h *Handler) GetUsers(
 	logger := core_logger.FromContext(ctx)
 	responseHandler := core_http_response.NewResponseHandler(logger, rw)
 
-	input, err := getUsersInputFromRequest(r)
+	input, err := getTasksInputFromRequest(r)
 	if err != nil {
 		responseHandler.ErrorResponse(
 			err,
@@ -27,11 +27,11 @@ func (h *Handler) GetUsers(
 		return
 	}
 
-	output, err := h.service.GetUsers(ctx, input)
+	output, err := h.service.GetTasks(ctx, input)
 	if err != nil {
 		responseHandler.ErrorResponse(
 			err,
-			"failed to get users",
+			"failed to get tasks",
 		)
 		return
 	}
@@ -39,23 +39,30 @@ func (h *Handler) GetUsers(
 	responseHandler.JSONResponse(output, http.StatusOK)
 }
 
-func getUsersInputFromRequest(r *http.Request) (users_dto.GetUsersInput, error) {
+func getTasksInputFromRequest(r *http.Request) (tasks_dto.GetTasksInput, error) {
 	const (
+		userIDKey = "user_id"
 		limitKey  = "limit"
 		offsetKey = "offset"
 	)
 
+	userID, err := core_http_request.GetIntQueryParam(r, userIDKey)
+	if err != nil {
+		return tasks_dto.GetTasksInput{}, fmt.Errorf("get '%s' query param: %w", userIDKey, err)
+	}
+
 	limit, err := core_http_request.GetIntQueryParam(r, limitKey)
 	if err != nil {
-		return users_dto.GetUsersInput{}, fmt.Errorf("get '%s' query param: %w", limitKey, err)
+		return tasks_dto.GetTasksInput{}, fmt.Errorf("get '%s' query param: %w", limitKey, err)
 	}
 
 	offset, err := core_http_request.GetIntQueryParam(r, offsetKey)
 	if err != nil {
-		return users_dto.GetUsersInput{}, fmt.Errorf("get '%s' query param: %w", offsetKey, err)
+		return tasks_dto.GetTasksInput{}, fmt.Errorf("get '%s' query param: %w", offsetKey, err)
 	}
 
-	return users_dto.GetUsersInput{
+	return tasks_dto.GetTasksInput{
+		UserID: userID,
 		Limit:  limit,
 		Offset: offset,
 	}, nil

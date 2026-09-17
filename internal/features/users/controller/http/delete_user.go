@@ -28,7 +28,7 @@ func (h *Handler) DeleteUser(
 	if err := h.service.DeleteUser(ctx, userID); err != nil {
 		responseHandler.ErrorResponse(
 			err,
-			"failed to get user",
+			"failed to delete user",
 		)
 		return
 	}

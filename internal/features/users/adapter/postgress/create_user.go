@@ -25,10 +25,10 @@ func (p *Pool) CreateUser(
 		user.FullName,
 		user.PhoneNumber,
 	)
-	user, err := scanUserRow(row)
+	newUser, err := scanUserRow(row)
 	if err != nil {
 		return domain.User{}, fmt.Errorf("scan error: %w", err)
 	}
 
-	return user, nil
+	return newUser, nil
 }

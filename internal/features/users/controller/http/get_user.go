@@ -25,7 +25,7 @@ func (h *Handler) GetUser(
 		return
 	}
 
-	user, err := h.service.GetUser(ctx, userID)
+	output, err := h.service.GetUser(ctx, userID)
 	if err != nil {
 		responseHandler.ErrorResponse(
 			err,
@@ -34,5 +34,5 @@ func (h *Handler) GetUser(
 		return
 	}
 
-	responseHandler.JSONResponse(user, http.StatusOK)
+	responseHandler.JSONResponse(output, http.StatusOK)
 }
