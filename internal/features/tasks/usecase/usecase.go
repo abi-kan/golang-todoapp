@@ -1,4 +1,4 @@
-package users_usecase
+package tasks_usecase
 
 import (
 	"context"
@@ -7,36 +7,37 @@ import (
 )
 
 type Postgres interface {
-	CreateUser(
+	CreateTask(
 		ctx context.Context,
-		user domain.User,
-	) (domain.User, error)
-	GetUsers(
+		task domain.Task,
+	) (domain.Task, error)
+	GetTasks(
 		ctx context.Context,
+		userID *int,
 		limit *int,
 		offset *int,
-	) ([]domain.User, error)
-	GetUser(
+	) ([]domain.Task, error)
+	GetTask(
 		ctx context.Context,
 		id int,
-	) (domain.User, error)
-	DeleteUser(
+	) (domain.Task, error)
+	DeleteTask(
 		ctx context.Context,
 		id int,
 	) error
-	PatchUser(
+	PatchTask(
 		ctx context.Context,
 		id int,
-		user domain.User,
-	) (domain.User, error)
+		task domain.Task,
+	) (domain.Task, error)
 }
 
-type Users struct {
+type Tasks struct {
 	postgres Postgres
 }
 
-func NewUsers(postgres Postgres) *Users {
-	return &Users{
+func NewTasks(postgres Postgres) *Tasks {
+	return &Tasks{
 		postgres: postgres,
 	}
 }

@@ -2,6 +2,7 @@ package core_pgx
 
 import (
 	"errors"
+	"fmt"
 
 	core_postgres "github.com/abi-kan/golang-todoapp/internal/core/adapter/postgres"
 	"github.com/jackc/pgx/v5"
@@ -19,9 +20,7 @@ type pgxRow struct {
 func (r pgxRow) Scan(dest ...any) error {
 	err := r.Row.Scan(dest...)
 	if err != nil {
-		if errors.Is(err, pgx.ErrNoRows) {
-			return core_postgres.ErrNoRows
-		}
+		return mapError(err)
 	}
 
 	return err
@@ -29,4 +28,20 @@ func (r pgxRow) Scan(dest ...any) error {
 
 type pgxCommandTag struct {
 	pgconn.CommandTag
+}
+
+func mapError(sourceErr error) error {
+	const pgxViolatesForeignKeyCode = "23503"
+
+	if errors.Is(sourceErr, pgx.ErrNoRows) {
+		return core_postgres.ErrNoRows
+	}
+
+	if pgErr, ok := errors.AsType[*pgconn.PgError](sourceErr); ok {
+		if pgErr.Code == pgxViolatesForeignKeyCode {
+			return fmt.Errorf("%v: %w", sourceErr, core_postgres.ErrViolatesForeignKey)
+		}
+	}
+
+	return fmt.Errorf("%v: %w", sourceErr, core_postgres.ErrUnknown)
 }

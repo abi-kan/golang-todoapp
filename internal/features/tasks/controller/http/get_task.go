@@ -1,4 +1,4 @@
-package users_http
+package tasks_http
 
 import (
 	"net/http"
@@ -6,10 +6,9 @@ import (
 	core_logger "github.com/abi-kan/golang-todoapp/internal/core/logger"
 	core_http_request "github.com/abi-kan/golang-todoapp/internal/core/transport/http/request"
 	core_http_response "github.com/abi-kan/golang-todoapp/internal/core/transport/http/response"
-	users_dto "github.com/abi-kan/golang-todoapp/internal/features/users/dto"
 )
 
-func (h *Handler) CreateUser(
+func (h *Handler) GetTask(
 	rw http.ResponseWriter,
 	r *http.Request,
 ) {
@@ -17,26 +16,23 @@ func (h *Handler) CreateUser(
 	logger := core_logger.FromContext(ctx)
 	responseHandler := core_http_response.NewResponseHandler(logger, rw)
 
-	var input users_dto.CreateUserInput
-	if err := core_http_request.DecodeAndValidateRequest(r, &input); err != nil {
-		responseHandler.ErrorResponse(
-			err,
-			"failed to decode and validate HTTP request",
-		)
-		return
-	}
-
-	output, err := h.service.CreateUser(
-		ctx,
-		input,
-	)
+	taskID, err := core_http_request.GetIntPathValue(r, "id")
 	if err != nil {
 		responseHandler.ErrorResponse(
 			err,
-			"failed to create user",
+			"failed to get 'taskID' path value",
 		)
 		return
 	}
 
-	responseHandler.JSONResponse(output, http.StatusCreated)
+	output, err := h.service.GetTask(ctx, taskID)
+	if err != nil {
+		responseHandler.ErrorResponse(
+			err,
+			"failed to get task",
+		)
+		return
+	}
+
+	responseHandler.JSONResponse(output, http.StatusOK)
 }

@@ -9,7 +9,7 @@ env-down:
 	@docker compose down todoapp-postgres
 
 env-cleanup:
-	@read -p "Clear all environment volume files? Risk of data loss! [y/N]: " answer; \
+	@read -p "Clear all environment volume files? Warning: Data will be lost! [y/N]: " answer; \
 	if [ "$$answer" = "y" ]; then \
 		docker compose down todoapp-postgres port-forwarder && \
 		rm -rf ${PROJECT_ROOT}/out/pgdata && \
@@ -50,6 +50,15 @@ migrate-action:
 		-path /migrations \
 		-database postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@todoapp-postgres:5432/${POSTGRES_DB}?sslmode=disable \
 		$(action)
+
+logs-cleanup:
+	@read -p "Clear all log files? Warning: Data will be lost! [y/N]: " answer; \
+	if [ "$$answer" = "y" ]; then \
+		rm -rf ${PROJECT_ROOT}/out/logs && \
+		echo "Log files cleared"; \
+	else \
+		echo "Cleanup aborted."; \
+	fi
 
 run: fmt vet
 	@export LOGGER_FOLDER=${PROJECT_ROOT}/out/logs && \

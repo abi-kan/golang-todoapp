@@ -10,14 +10,13 @@ import (
 
 func (u *Users) GetUsers(
 	ctx context.Context,
-	limit *int,
-	offset *int,
+	input users_dto.GetUsersInput,
 ) (users_dto.GetUsersOutput, error) {
-	if err := validateGetUsersQuery(limit, offset); err != nil {
+	if err := validateGetUsersInput(input); err != nil {
 		return nil, err
 	}
 
-	users, err := u.postgres.GetUsers(ctx, limit, offset)
+	users, err := u.postgres.GetUsers(ctx, input.Limit, input.Offset)
 	if err != nil {
 		return nil, fmt.Errorf("get users from repository: %w", err)
 	}
@@ -29,15 +28,15 @@ func (u *Users) GetUsers(
 	return output, nil
 }
 
-func validateGetUsersQuery(limit, offset *int) error {
-	if limit != nil && *limit < 0 {
+func validateGetUsersInput(input users_dto.GetUsersInput) error {
+	if input.Limit != nil && *input.Limit < 0 {
 		return fmt.Errorf(
 			"'limit' must be non-negative: %w",
 			core_errors.ErrInvalidArgument,
 		)
 	}
 
-	if offset != nil && *offset < 0 {
+	if input.Offset != nil && *input.Offset < 0 {
 		return fmt.Errorf(
 			"'offset' must be non-negative: %w",
 			core_errors.ErrInvalidArgument,

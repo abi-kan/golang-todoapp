@@ -44,7 +44,7 @@ func (u *Users) PatchUser(
 		)
 	}
 
-	output := users_dto.PatchUserOutput(patchedUser)
+	output := users_dto.PatchUserOutput(users_dto.NewDTOUserFromDomain(patchedUser))
 
 	return output, nil
 }

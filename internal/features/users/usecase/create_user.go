@@ -14,7 +14,7 @@ func (u *Users) CreateUser(
 ) (users_dto.CreateUserOutput, error) {
 	user, err := domain.NewUser(input.FullName, input.PhoneNumber)
 	if err != nil {
-		return users_dto.CreateUserOutput{}, fmt.Errorf("validate domain user: %w", err)
+		return users_dto.CreateUserOutput{}, fmt.Errorf("validate user domain: %w", err)
 	}
 
 	newUser, err := u.postgres.CreateUser(ctx, user)
