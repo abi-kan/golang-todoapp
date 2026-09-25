@@ -19,7 +19,7 @@ func (u *Users) GetUser(
 		)
 	}
 
-	output := users_dto.GetUserOutput(users_dto.NewDTOUserFromDomain(user))
+	output := users_dto.GetUserOutput(users_dto.NewUserDTOFromDomain(user))
 
 	return output, nil
 }

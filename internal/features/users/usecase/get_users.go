@@ -22,7 +22,7 @@ func (u *Users) GetUsers(
 	}
 
 	output := users_dto.GetUsersOutput(
-		users_dto.NewDTOUsersFromDomain(users),
+		users_dto.NewUsersDTOFromDomain(users),
 	)
 
 	return output, nil

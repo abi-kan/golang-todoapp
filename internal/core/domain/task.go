@@ -37,6 +37,20 @@ func NewTask(
 	return task, nil
 }
 
+func (t *Task) CompletionDuration() *time.Duration {
+	if t.Completed == false {
+		return nil
+	}
+
+	if t.CompletedAt == nil {
+		return nil
+	}
+
+	duration := t.CompletedAt.Sub(t.CreatedAt)
+
+	return &duration
+}
+
 func (t *Task) ApplyPatch(patch TaskPatch) error {
 	tmpTask := *t
 

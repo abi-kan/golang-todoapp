@@ -14,10 +14,13 @@ import (
 	core_logger "github.com/abi-kan/golang-todoapp/internal/core/logger"
 	core_http_middleware "github.com/abi-kan/golang-todoapp/internal/core/transport/http/middleware"
 	core_http_server "github.com/abi-kan/golang-todoapp/internal/core/transport/http/server"
-	tasks_postgres "github.com/abi-kan/golang-todoapp/internal/features/tasks/adapter/postgress"
+	statistics_postgres "github.com/abi-kan/golang-todoapp/internal/features/statistics/adapter/postgres"
+	statistics_http "github.com/abi-kan/golang-todoapp/internal/features/statistics/controller/http"
+	statistics_usecase "github.com/abi-kan/golang-todoapp/internal/features/statistics/usecase"
+	tasks_postgres "github.com/abi-kan/golang-todoapp/internal/features/tasks/adapter/postgres"
 	tasks_http "github.com/abi-kan/golang-todoapp/internal/features/tasks/controller/http"
 	tasks_usecase "github.com/abi-kan/golang-todoapp/internal/features/tasks/usecase"
-	users_postgres "github.com/abi-kan/golang-todoapp/internal/features/users/adapter/postgress"
+	users_postgres "github.com/abi-kan/golang-todoapp/internal/features/users/adapter/postgres"
 	users_http "github.com/abi-kan/golang-todoapp/internal/features/users/controller/http"
 	users_usecase "github.com/abi-kan/golang-todoapp/internal/features/users/usecase"
 	"go.uber.org/zap"
@@ -77,6 +80,13 @@ func createServer(
 		),
 	)
 
+	logger.Debug("initializing feature", zap.String("feature", "statistics"))
+	statisticsTransportHTTP := statistics_http.NewHandler(
+		statistics_usecase.NewStatistics(
+			statistics_postgres.NewPool(pool),
+		),
+	)
+
 	logger.Debug("initializing HTTP server")
 	httpServer := core_http_server.NewServer(
 		core_http_server.NewConfigMust(),
@@ -89,6 +99,7 @@ func createServer(
 	apiVersionRouterV1 := core_http_server.NewAPIVersionRouter(core_http_server.APIVersion1)
 	apiVersionRouterV1.RegisterRoutes(usersTransportHTTP.Routes()...)
 	apiVersionRouterV1.RegisterRoutes(tasksTransportHTTP.Routes()...)
+	apiVersionRouterV1.RegisterRoutes(statisticsTransportHTTP.Routes()...)
 	httpServer.RegisterAPIRouters(apiVersionRouterV1)
 
 	/*

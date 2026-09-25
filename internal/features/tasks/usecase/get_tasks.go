@@ -22,7 +22,7 @@ func (t *Tasks) GetTasks(
 	}
 
 	output := tasks_dto.GetTasksOutput(
-		tasks_dto.NewDTOTasksFromDomain(tasks),
+		tasks_dto.NewTasksDTOFromDomain(tasks),
 	)
 
 	return output, nil
