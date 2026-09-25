@@ -18,7 +18,7 @@ type Task struct {
 	AuthorUserID int `json:"author_user_id"`
 }
 
-func NewDTOTaskFromDomain(task domain.Task) Task {
+func NewTaskDTOFromDomain(task domain.Task) Task {
 	return Task{
 		ID:           task.ID,
 		Version:      task.Version,
@@ -31,10 +31,10 @@ func NewDTOTaskFromDomain(task domain.Task) Task {
 	}
 }
 
-func NewDTOTasksFromDomain(tasks []domain.Task) []Task {
+func NewTasksDTOFromDomain(tasks []domain.Task) []Task {
 	dtoTasks := make([]Task, len(tasks))
 	for index, task := range tasks {
-		dtoTasks[index] = NewDTOTaskFromDomain(task)
+		dtoTasks[index] = NewTaskDTOFromDomain(task)
 	}
 
 	return dtoTasks

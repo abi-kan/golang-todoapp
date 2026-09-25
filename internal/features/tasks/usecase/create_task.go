@@ -33,7 +33,7 @@ func (t *Tasks) CreateTask(
 	}
 
 	output := tasks_dto.CreateTaskOutput(
-		tasks_dto.NewDTOTaskFromDomain(newTask),
+		tasks_dto.NewTaskDTOFromDomain(newTask),
 	)
 
 	return output, nil

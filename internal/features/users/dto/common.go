@@ -9,7 +9,7 @@ type User struct {
 	PhoneNumber *string `json:"phone_number"`
 }
 
-func NewDTOUserFromDomain(user domain.User) User {
+func NewUserDTOFromDomain(user domain.User) User {
 	return User{
 		ID:          user.ID,
 		Version:     user.Version,
@@ -18,10 +18,10 @@ func NewDTOUserFromDomain(user domain.User) User {
 	}
 }
 
-func NewDTOUsersFromDomain(users []domain.User) []User {
+func NewUsersDTOFromDomain(users []domain.User) []User {
 	dtoUsers := make([]User, len(users))
 	for index, user := range users {
-		dtoUsers[index] = NewDTOUserFromDomain(user)
+		dtoUsers[index] = NewUserDTOFromDomain(user)
 	}
 
 	return dtoUsers

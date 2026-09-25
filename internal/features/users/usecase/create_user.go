@@ -23,7 +23,7 @@ func (u *Users) CreateUser(
 	}
 
 	output := users_dto.CreateUserOutput(
-		users_dto.NewDTOUserFromDomain(newUser),
+		users_dto.NewUserDTOFromDomain(newUser),
 	)
 
 	return output, nil

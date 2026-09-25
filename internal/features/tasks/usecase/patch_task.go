@@ -45,7 +45,7 @@ func (t *Tasks) PatchTask(
 		)
 	}
 
-	output := tasks_dto.PatchTaskOutput(tasks_dto.NewDTOTaskFromDomain(patchedTask))
+	output := tasks_dto.PatchTaskOutput(tasks_dto.NewTaskDTOFromDomain(patchedTask))
 
 	return output, nil
 }
