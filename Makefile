@@ -60,7 +60,7 @@ logs-cleanup:
 		echo "Cleanup aborted."; \
 	fi
 
-run: fmt vet
+run: fmt vet staticcheck
 	@export LOGGER_FOLDER=${PROJECT_ROOT}/out/logs && \
 	export POSTGRES_HOST=localhost && \
 	go mod tidy && \
