@@ -60,6 +60,12 @@ logs-cleanup:
 		echo "Cleanup aborted."; \
 	fi
 
+deploy:
+	@docker compose up -d --build todoapp
+	
+undeploy:
+	@docker compose down todoapp
+
 run: fmt vet staticcheck
 	@export LOGGER_FOLDER=${PROJECT_ROOT}/out/logs && \
 	export POSTGRES_HOST=localhost && \
