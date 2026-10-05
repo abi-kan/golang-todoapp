@@ -10,6 +10,17 @@ import (
 	users_dto "github.com/abi-kan/golang-todoapp/internal/features/users/dto"
 )
 
+// GetUsers godoc
+// @Summary Get users
+// @Description Get a list of users with optional pagination
+// @Tags users
+// @Produce json
+// @Param limit query int false "Page size"
+// @Param offset query int false "Page offset"
+// @Success 200 {object} users_dto.GetUsersOutput "The users list has been successfully retrieved"
+// @Failure 400 {object} core_http_response.ErrorResponse "Bad request"
+// @Failure 500 {object} core_http_response.ErrorResponse "Internal server error"
+// @Router /users [get]
 func (h *Handler) GetUsers(
 	rw http.ResponseWriter,
 	r *http.Request,

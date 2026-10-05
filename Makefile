@@ -12,7 +12,7 @@ env-cleanup:
 	@read -p "Clear all environment volume files? Warning: Data will be lost! [y/N]: " answer; \
 	if [ "$$answer" = "y" ]; then \
 		docker compose down todoapp-postgres port-forwarder && \
-		rm -rf ${PROJECT_ROOT}/out/pgdata && \
+		rm -rf "${PROJECT_ROOT}/out/pgdata" && \
 		echo "Environment volume files cleared"; \
 	else \
 		echo "Cleanup aborted."; \
@@ -48,13 +48,13 @@ migrate-action:
 	fi; \
 	docker compose run --rm todoapp-postgres-migrate \
 		-path /migrations \
-		-database postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@todoapp-postgres:5432/${POSTGRES_DB}?sslmode=disable \
-		$(action)
+		-database "postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@todoapp-postgres:5432/${POSTGRES_DB}?sslmode=disable" \
+		"$(action)"
 
 logs-cleanup:
 	@read -p "Clear all log files? Warning: Data will be lost! [y/N]: " answer; \
 	if [ "$$answer" = "y" ]; then \
-		rm -rf ${PROJECT_ROOT}/out/logs && \
+		rm -rf "${PROJECT_ROOT}/out/logs" && \
 		echo "Log files cleared"; \
 	else \
 		echo "Cleanup aborted."; \
@@ -62,15 +62,23 @@ logs-cleanup:
 
 deploy:
 	@docker compose up -d --build todoapp
-	
+
 undeploy:
 	@docker compose down todoapp
 
-run: fmt vet staticcheck
-	@export LOGGER_FOLDER=${PROJECT_ROOT}/out/logs && \
+swagger-gen:
+	@docker compose run --rm swagger \
+		init \
+		-g cmd/todoapp/main.go \
+		-o docs \
+		--parseInternal \
+		--parseDependency
+
+run: fmt vet
+	@export LOGGER_FOLDER="${PROJECT_ROOT}/out/logs" && \
 	export POSTGRES_HOST=localhost && \
 	go mod tidy && \
-	go run ${PROJECT_ROOT}/cmd/app/main.go
+	go run "${PROJECT_ROOT}/cmd/todoapp/main.go"
 
 fmt:
 	@go fmt ./...

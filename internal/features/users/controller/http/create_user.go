@@ -9,6 +9,17 @@ import (
 	users_dto "github.com/abi-kan/golang-todoapp/internal/features/users/dto"
 )
 
+// CreateUser godoc
+// @Summary Create user
+// @Description Create a new user in the system
+// @Tags users
+// @Accept json
+// @Produce json
+// @Param request body users_dto.CreateUserInput true "CreateUser request body"
+// @Success 201 {object} users_dto.CreateUserOutput "User has been successfully created"
+// @Failure 400 {object} core_http_response.ErrorResponse "Bad request"
+// @Failure 500 {object} core_http_response.ErrorResponse "Internal server error"
+// @Router /users [post]
 func (h *Handler) CreateUser(
 	rw http.ResponseWriter,
 	r *http.Request,
