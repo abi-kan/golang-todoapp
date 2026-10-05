@@ -24,8 +24,15 @@ import (
 	users_http "github.com/abi-kan/golang-todoapp/internal/features/users/controller/http"
 	users_usecase "github.com/abi-kan/golang-todoapp/internal/features/users/usecase"
 	"go.uber.org/zap"
+
+	_ "github.com/abi-kan/golang-todoapp/docs"
 )
 
+// @title Golang Todo API
+// @version 1.0
+// @description Todo Application REST-API scheme
+// @host 127.0.0.1:5050
+// @BasePath /api/v1
 func main() {
 	config := core_config.NewConfigMust()
 	time.Local = config.TimeZone
@@ -91,6 +98,7 @@ func createServer(
 	httpServer := core_http_server.NewServer(
 		core_http_server.NewConfigMust(),
 		logger,
+		core_http_middleware.CORS(),
 		core_http_middleware.RequestID(),
 		core_http_middleware.Logger(logger),
 		core_http_middleware.Trace(),
@@ -111,6 +119,8 @@ func createServer(
 		apiVersionRouterV2.RegisterRoutes(usersTransportHTTP.Routes()...)
 		httpServer.RegisterAPIRouters(apiVersionRouterV2)
 	*/
+
+	httpServer.RegisterSwagger()
 
 	return httpServer
 }

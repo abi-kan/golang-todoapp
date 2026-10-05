@@ -1,0 +1,269 @@
+basePath: /api/v1
+definitions:
+  github_com_abi-kan_golang-todoapp_internal_core_transport_http_response.ErrorResponse:
+    properties:
+      error:
+        example: full error text
+        type: string
+      message:
+        example: short human-readable message
+        type: string
+    type: object
+  github_com_abi-kan_golang-todoapp_internal_features_users_dto.CreateUserInput:
+    properties:
+      full_name:
+        example: Ivan Ivanov
+        maxLength: 100
+        minLength: 3
+        type: string
+      phone_number:
+        example: "+79998887766"
+        maxLength: 15
+        minLength: 10
+        type: string
+    required:
+    - full_name
+    type: object
+  github_com_abi-kan_golang-todoapp_internal_features_users_dto.CreateUserOutput:
+    properties:
+      full_name:
+        example: Ivan Ivanov
+        type: string
+      id:
+        example: 10
+        type: integer
+      phone_number:
+        example: "+79998887766"
+        type: string
+      version:
+        example: 3
+        type: integer
+    type: object
+  github_com_abi-kan_golang-todoapp_internal_features_users_dto.GetUserOutput:
+    properties:
+      full_name:
+        example: Ivan Ivanov
+        type: string
+      id:
+        example: 10
+        type: integer
+      phone_number:
+        example: "+79998887766"
+        type: string
+      version:
+        example: 3
+        type: integer
+    type: object
+  github_com_abi-kan_golang-todoapp_internal_features_users_dto.PatchUserInput:
+    properties:
+      full_name:
+        example: Ivan Ivanov
+        type: string
+      phone_number:
+        example: "+79998887766"
+        type: string
+    type: object
+  github_com_abi-kan_golang-todoapp_internal_features_users_dto.PatchUserOutput:
+    properties:
+      full_name:
+        example: Ivan Ivanov
+        type: string
+      id:
+        example: 10
+        type: integer
+      phone_number:
+        example: "+79998887766"
+        type: string
+      version:
+        example: 3
+        type: integer
+    type: object
+  github_com_abi-kan_golang-todoapp_internal_features_users_dto.User:
+    properties:
+      full_name:
+        example: Ivan Ivanov
+        type: string
+      id:
+        example: 10
+        type: integer
+      phone_number:
+        example: "+79998887766"
+        type: string
+      version:
+        example: 3
+        type: integer
+    type: object
+host: 127.0.0.1:5050
+info:
+  contact: {}
+  description: Todo Application REST-API scheme
+  title: Golang Todo API
+  version: "1.0"
+paths:
+  /users:
+    get:
+      description: Get a list of users with optional pagination
+      parameters:
+      - description: Page size
+        in: query
+        name: limit
+        type: integer
+      - description: Page offset
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: The users list has been successfully retrieved
+          schema:
+            items:
+              $ref: '#/definitions/github_com_abi-kan_golang-todoapp_internal_features_users_dto.User'
+            type: array
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/github_com_abi-kan_golang-todoapp_internal_core_transport_http_response.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/github_com_abi-kan_golang-todoapp_internal_core_transport_http_response.ErrorResponse'
+      summary: Get users
+      tags:
+      - users
+    post:
+      consumes:
+      - application/json
+      description: Create a new user in the system
+      parameters:
+      - description: CreateUser request body
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_abi-kan_golang-todoapp_internal_features_users_dto.CreateUserInput'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: User has been successfully created
+          schema:
+            $ref: '#/definitions/github_com_abi-kan_golang-todoapp_internal_features_users_dto.CreateUserOutput'
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/github_com_abi-kan_golang-todoapp_internal_core_transport_http_response.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/github_com_abi-kan_golang-todoapp_internal_core_transport_http_response.ErrorResponse'
+      summary: Create user
+      tags:
+      - users
+  /users/{id}:
+    delete:
+      description: Delete an existing user in the system by ID
+      parameters:
+      - description: ID of the user to delete
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "204":
+          description: User has been successfully deleted
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/github_com_abi-kan_golang-todoapp_internal_core_transport_http_response.ErrorResponse'
+        "404":
+          description: User not found
+          schema:
+            $ref: '#/definitions/github_com_abi-kan_golang-todoapp_internal_core_transport_http_response.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/github_com_abi-kan_golang-todoapp_internal_core_transport_http_response.ErrorResponse'
+      summary: Delete user
+      tags:
+      - users
+    get:
+      description: Get a concrete user by ID
+      parameters:
+      - description: ID of the user to get
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User has been successfully found
+          schema:
+            $ref: '#/definitions/github_com_abi-kan_golang-todoapp_internal_features_users_dto.GetUserOutput'
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/github_com_abi-kan_golang-todoapp_internal_core_transport_http_response.ErrorResponse'
+        "404":
+          description: User not found
+          schema:
+            $ref: '#/definitions/github_com_abi-kan_golang-todoapp_internal_core_transport_http_response.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/github_com_abi-kan_golang-todoapp_internal_core_transport_http_response.ErrorResponse'
+      summary: Get user
+      tags:
+      - users
+    patch:
+      consumes:
+      - application/json
+      description: |-
+        Change a existing user's info in the system.
+        ### Logic of the request body fields (Tree-state logic):
+        1. **Field is missing**: `phone_number` is ignored, value in the database won't change.
+        2. **Field value is specified**: `"phone_number": "+79998887766"` new value will be saved to the database.
+        3. **Field value is null**: `"phone_number": null` current value in the database will be removed (set to NULL).
+        4. Restrictions: `full_name` can't be set to null
+      parameters:
+      - description: ID of the user to change
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: PatchUser request body
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_abi-kan_golang-todoapp_internal_features_users_dto.PatchUserInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User has been successfully changed
+          schema:
+            $ref: '#/definitions/github_com_abi-kan_golang-todoapp_internal_features_users_dto.PatchUserOutput'
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/github_com_abi-kan_golang-todoapp_internal_core_transport_http_response.ErrorResponse'
+        "404":
+          description: User not found
+          schema:
+            $ref: '#/definitions/github_com_abi-kan_golang-todoapp_internal_core_transport_http_response.ErrorResponse'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/github_com_abi-kan_golang-todoapp_internal_core_transport_http_response.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/github_com_abi-kan_golang-todoapp_internal_core_transport_http_response.ErrorResponse'
+      summary: Change user
+      tags:
+      - users
+swagger: "2.0"
