@@ -2,41 +2,49 @@ package core_config
 
 import (
 	"fmt"
-	"os"
-	"time"
+
+	core_pgx "github.com/abi-kan/golang-todoapp/internal/core/adapter/postgres/pgx"
+	core_logger "github.com/abi-kan/golang-todoapp/internal/core/logger"
+	core_http_server "github.com/abi-kan/golang-todoapp/internal/core/transport/http/server"
 )
 
 type Config struct {
-	TimeZone *time.Location
+	App      App
+	HTTP     core_http_server.Config
+	Postgres core_pgx.Config
+	Logger   core_logger.Config
 }
 
-func NewConfig() (*Config, error) {
-	envVar := os.Getenv("TIME_ZONE")
-	if envVar == "" {
-		envVar = "UTC"
+func NewConfig() Config {
+	appConfig, err := newAppConfig()
+	if err != nil {
+		err = fmt.Errorf("get app config: %w", err)
+		panic(err)
 	}
 
-	timeZone, err := time.LoadLocation(envVar)
+	httpConfig, err := core_http_server.NewConfig()
 	if err != nil {
-		return nil, fmt.Errorf(
-			"load time zone: %s: %w",
-			envVar,
-			err,
-		)
+		err = fmt.Errorf("get http config: %w", err)
+		panic(err)
+	}
+
+	postgresConfig, err := core_pgx.NewConfig()
+	if err != nil {
+		err = fmt.Errorf("get postgress config: %w", err)
+		panic(err)
+	}
+
+	loggerConfig, err := core_logger.NewConfig()
+	if err != nil {
+		err = fmt.Errorf("get logger config: %w", err)
+		panic(err)
 	}
 
 	config := Config{
-		TimeZone: timeZone,
-	}
-
-	return &config, nil
-}
-
-func NewConfigMust() *Config {
-	config, err := NewConfig()
-	if err != nil {
-		err = fmt.Errorf("get core config: %w", err)
-		panic(err)
+		App:      appConfig,
+		HTTP:     httpConfig,
+		Postgres: postgresConfig,
+		Logger:   loggerConfig,
 	}
 
 	return config
