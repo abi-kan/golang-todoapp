@@ -34,8 +34,8 @@ import (
 // @host 127.0.0.1:5050
 // @BasePath /api/v1
 func main() {
-	config := core_config.NewConfigMust()
-	time.Local = config.TimeZone
+	config := core_config.NewConfig()
+	time.Local = config.App.TimeZone
 
 	ctx, cancel := signal.NotifyContext(
 		context.Background(),
@@ -44,7 +44,7 @@ func main() {
 	)
 	defer cancel()
 
-	logger, err := core_logger.NewLogger(core_logger.NewConfigMust())
+	logger, err := core_logger.NewLogger(config.Logger)
 	if err != nil {
 		fmt.Println("failed to init application logger:", err)
 		os.Exit(1)
@@ -56,14 +56,14 @@ func main() {
 	logger.Debug("initializing postgres connection pool")
 	pool, err := core_pgx.NewPool(
 		ctx,
-		core_pgx.NewConfigMust(),
+		config.Postgres,
 	)
 	if err != nil {
 		logger.Fatal("failed to init postgres connection pool", zap.Error(err))
 	}
 	defer pool.Close()
 
-	httpServer := createServer(pool, logger)
+	httpServer := createServer(pool, logger, config)
 	if err := httpServer.Run(ctx); err != nil {
 		logger.Error("HTTP server run error", zap.Error(err))
 	}
@@ -72,6 +72,7 @@ func main() {
 func createServer(
 	pool core_postgres.Pool,
 	logger *core_logger.Logger,
+	config core_config.Config,
 ) *core_http_server.Server {
 	logger.Debug("initializing feature", zap.String("feature", "users"))
 	usersTransportHTTP := users_http.NewHandler(
@@ -96,7 +97,7 @@ func createServer(
 
 	logger.Debug("initializing HTTP server")
 	httpServer := core_http_server.NewServer(
-		core_http_server.NewConfigMust(),
+		config.HTTP,
 		logger,
 		core_http_middleware.CORS(),
 		core_http_middleware.RequestID(),

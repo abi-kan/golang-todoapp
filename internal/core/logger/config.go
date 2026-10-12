@@ -18,13 +18,3 @@ func NewConfig() (Config, error) {
 
 	return config, nil
 }
-
-func NewConfigMust() Config {
-	config, err := NewConfig()
-	if err != nil {
-		err = fmt.Errorf("get logger config: %w", err)
-		panic(err)
-	}
-
-	return config
-}
