@@ -32,12 +32,23 @@ type Postgres interface {
 	) (domain.Task, error)
 }
 
-type Tasks struct {
-	postgres Postgres
+type Redis interface {
+	SetTask(ctx context.Context, task domain.Task) error
+	GetTask(ctx context.Context, id int) (domain.Task, error)
+	DeleteTask(ctx context.Context, id int) error
 }
 
-func NewTasks(postgres Postgres) *Tasks {
+type Tasks struct {
+	postgres Postgres
+	redis    Redis
+}
+
+func NewTasks(
+	postgres Postgres,
+	redis Redis,
+) *Tasks {
 	return &Tasks{
 		postgres: postgres,
+		redis:    redis,
 	}
 }

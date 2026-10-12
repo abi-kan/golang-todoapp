@@ -5,7 +5,9 @@ import (
 	"fmt"
 
 	"github.com/abi-kan/golang-todoapp/internal/core/domain"
+	core_logger "github.com/abi-kan/golang-todoapp/internal/core/logger"
 	users_dto "github.com/abi-kan/golang-todoapp/internal/features/users/dto"
+	"go.uber.org/zap"
 )
 
 func (u *Users) PatchUser(
@@ -41,6 +43,14 @@ func (u *Users) PatchUser(
 		return users_dto.PatchUserOutput{}, fmt.Errorf(
 			"patch user: %w",
 			err,
+		)
+	}
+
+	if err := u.redis.DeleteUser(ctx, id); err != nil {
+		logger := core_logger.FromContext(ctx)
+		logger.Warn("cache delete user failed",
+			zap.Int("id", id),
+			zap.Error(err),
 		)
 	}
 

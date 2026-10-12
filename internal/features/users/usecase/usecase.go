@@ -31,12 +31,23 @@ type Postgres interface {
 	) (domain.User, error)
 }
 
-type Users struct {
-	postgres Postgres
+type Redis interface {
+	SetUser(ctx context.Context, user domain.User) error
+	GetUser(ctx context.Context, id int) (domain.User, error)
+	DeleteUser(ctx context.Context, id int) error
 }
 
-func NewUsers(postgres Postgres) *Users {
+type Users struct {
+	postgres Postgres
+	redis    Redis
+}
+
+func NewUsers(
+	postgres Postgres,
+	redis Redis,
+) *Users {
 	return &Users{
 		postgres: postgres,
+		redis:    redis,
 	}
 }
