@@ -5,7 +5,9 @@ import (
 	"fmt"
 
 	"github.com/abi-kan/golang-todoapp/internal/core/domain"
+	core_logger "github.com/abi-kan/golang-todoapp/internal/core/logger"
 	tasks_dto "github.com/abi-kan/golang-todoapp/internal/features/tasks/dto"
+	"go.uber.org/zap"
 )
 
 func (t *Tasks) PatchTask(
@@ -42,6 +44,14 @@ func (t *Tasks) PatchTask(
 		return tasks_dto.PatchTaskOutput{}, fmt.Errorf(
 			"patch task: %w",
 			err,
+		)
+	}
+
+	if err := t.redis.DeleteTask(ctx, id); err != nil {
+		logger := core_logger.FromContext(ctx)
+		logger.Warn("cache delete task failed",
+			zap.Int("id", id),
+			zap.Error(err),
 		)
 	}
 

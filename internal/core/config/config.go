@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	core_pgx "github.com/abi-kan/golang-todoapp/internal/core/adapter/postgres/pgx"
+	core_redis "github.com/abi-kan/golang-todoapp/internal/core/adapter/redis"
 	core_logger "github.com/abi-kan/golang-todoapp/internal/core/logger"
 	core_http_server "github.com/abi-kan/golang-todoapp/internal/core/transport/http/server"
 )
@@ -12,6 +13,7 @@ type Config struct {
 	App      App
 	HTTP     core_http_server.Config
 	Postgres core_pgx.Config
+	Redis    core_redis.Config
 	Logger   core_logger.Config
 }
 
@@ -34,6 +36,12 @@ func NewConfig() Config {
 		panic(err)
 	}
 
+	redisConfig, err := core_redis.NewConfig()
+	if err != nil {
+		err = fmt.Errorf("get redis config: %w", err)
+		panic(err)
+	}
+
 	loggerConfig, err := core_logger.NewConfig()
 	if err != nil {
 		err = fmt.Errorf("get logger config: %w", err)
@@ -44,6 +52,7 @@ func NewConfig() Config {
 		App:      appConfig,
 		HTTP:     httpConfig,
 		Postgres: postgresConfig,
+		Redis:    redisConfig,
 		Logger:   loggerConfig,
 	}
 

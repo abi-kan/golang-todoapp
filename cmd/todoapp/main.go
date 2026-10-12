@@ -10,6 +10,7 @@ import (
 
 	core_postgres "github.com/abi-kan/golang-todoapp/internal/core/adapter/postgres"
 	core_pgx "github.com/abi-kan/golang-todoapp/internal/core/adapter/postgres/pgx"
+	core_redis "github.com/abi-kan/golang-todoapp/internal/core/adapter/redis"
 	core_config "github.com/abi-kan/golang-todoapp/internal/core/config"
 	core_logger "github.com/abi-kan/golang-todoapp/internal/core/logger"
 	core_http_middleware "github.com/abi-kan/golang-todoapp/internal/core/transport/http/middleware"
@@ -18,9 +19,11 @@ import (
 	statistics_http "github.com/abi-kan/golang-todoapp/internal/features/statistics/controller/http"
 	statistics_usecase "github.com/abi-kan/golang-todoapp/internal/features/statistics/usecase"
 	tasks_postgres "github.com/abi-kan/golang-todoapp/internal/features/tasks/adapter/postgres"
+	tasks_redis "github.com/abi-kan/golang-todoapp/internal/features/tasks/adapter/redis"
 	tasks_http "github.com/abi-kan/golang-todoapp/internal/features/tasks/controller/http"
 	tasks_usecase "github.com/abi-kan/golang-todoapp/internal/features/tasks/usecase"
 	users_postgres "github.com/abi-kan/golang-todoapp/internal/features/users/adapter/postgres"
+	users_redis "github.com/abi-kan/golang-todoapp/internal/features/users/adapter/redis"
 	users_http "github.com/abi-kan/golang-todoapp/internal/features/users/controller/http"
 	users_usecase "github.com/abi-kan/golang-todoapp/internal/features/users/usecase"
 	"go.uber.org/zap"
@@ -52,7 +55,6 @@ func main() {
 	defer logger.Close()
 
 	logger.Debug("application time zone", zap.Any("zone", time.Local))
-
 	logger.Debug("initializing postgres connection pool")
 	pool, err := core_pgx.NewPool(
 		ctx,
@@ -63,21 +65,30 @@ func main() {
 	}
 	defer pool.Close()
 
-	httpServer := createServer(pool, logger, config)
+	logger.Debug("initializing redis client")
+	redis, err := core_redis.NewClient(ctx, config.Redis)
+	if err != nil {
+		logger.Fatal("failed to init redis client", zap.Error(err))
+	}
+	defer redis.Close()
+
+	httpServer := createServer(logger, pool, redis, config)
 	if err := httpServer.Run(ctx); err != nil {
 		logger.Error("HTTP server run error", zap.Error(err))
 	}
 }
 
 func createServer(
-	pool core_postgres.Pool,
 	logger *core_logger.Logger,
+	pool core_postgres.Pool,
+	redis *core_redis.Client,
 	config core_config.Config,
 ) *core_http_server.Server {
 	logger.Debug("initializing feature", zap.String("feature", "users"))
 	usersTransportHTTP := users_http.NewHandler(
 		users_usecase.NewUsers(
 			users_postgres.NewPool(pool),
+			users_redis.NewClient(redis),
 		),
 	)
 
@@ -85,6 +96,7 @@ func createServer(
 	tasksTransportHTTP := tasks_http.NewHandler(
 		tasks_usecase.NewTasks(
 			tasks_postgres.NewPool(pool),
+			tasks_redis.NewClient(redis),
 		),
 	)
 
