@@ -6,7 +6,7 @@ DB_SERVICES   := todoapp-postgres todoapp-redis
 PORT_SERVICES := postgres-port-forwarder redis-port-forwarder
 
 env-up:
-	@docker compose up -d $(DB_SERVICES) $(PORT_SERVICES)
+	@docker compose up -d $(DB_SERVICES)
 
 env-down:
 	@docker compose down $(DB_SERVICES) $(PORT_SERVICES)
@@ -22,11 +22,11 @@ env-cleanup:
 		echo "Cleanup aborted."; \
 	fi
 
-# env-port-forward:
-# 	@docker compose up -d $(PORT_SERVICES)
-# 
-# env-port-close:
-# 	@docker compose down $(PORT_SERVICES)
+env-port-forward:
+	@docker compose up -d $(PORT_SERVICES)
+
+env-port-close:
+	@docker compose down $(PORT_SERVICES)
 
 migrate-create:
 	@if [ -z "$(seq)" ]; then \
